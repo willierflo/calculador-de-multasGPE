@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<!-- saved from url=(0132)blob:https://026qtrdqxw5nphvn2yxr00nv7mfd62eko3okfghc2a6u06syih-h775241406.scf.usercontent.goog/2b375949-afa3-406e-b5f5-01cfbcc4f9b6 -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script>(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjM3MTE1MjViZGZmNmM4YmM2NjM2NDE3ZjgwOGMzYzFlYTkyN2E0YmMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6XC9cL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbVwvZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIxNjA3NTUyMjI0NTQ0NzQzMjc0NCIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiI0NjQzM2M2Yjk4NjQtY2FsY3VsYWRvcmFfbXVsdGFzX3N0YW5kYWxvbmUtODQifSwiZXhwIjoxNzUxMzk5MDY4LCJpYXQiOjE3NTEzOTU0NjgsImFsZyI6IlJTMjU2In0.LlWmzc5ydIZMAR6ps5F3uBm8Q-EJIHhJtfo8vZ7aY_-ZWsp4scY4dKtwGop3U22tCbxYsDf12XPSDeYraRaLqbFfU8lqIANMu8e2C23f8r2AOU_8wpx68A4_ObOLo702cg7DBAucff1t9y4qcckFq8PwHHzJJFt95cr8r3t4p46YBADaMldtn9TTxjU4mwD_toSFILO4lFxPzroKMtr6fXbc1GAetgCQIGWUUV4705MjJrp2RvlpCktxjk8kCzV3TPz3tbEzQoM3QHEBR3u4BUE8mYNqohIsvR64KAuablFXK9Slgr8BA0F_vkgfuVlagpngFpRFi98UPBAqwNj_QQ","46433c6b9864-calculadora_multas_standalone-84")</script><script>(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script>let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          const mediaPromiseId = nextMediaPromiseId++;
+          const promise = new Promise((resolve, reject) => {
+            pendingMediaResolvers[mediaPromiseId] = (granted) => {
+              delete pendingMediaResolvers[mediaPromiseId];
+              if (granted) {
+                if (originalGetUserMedia) {
+                  originalGetUserMedia(constraints).then(resolve).catch(reject);
+                } else {
+                  reject(new Error("Original getUserMedia not available."));
+                }
+              } else {
+              reject(new DOMException('Permission denied', 'NotAllowedError'));
+            }
+          };
+        });
+
+        window.parent.postMessage({
+          type: 'requestMediaPermission',
+          constraints: constraints,
+          promiseId: mediaPromiseId,
+        }, '*');
+
+        return promise;
+      },
+      writable: false,
+      configurable: false
+    });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script>((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-2.5-flash-preview-04-17","imageModelName":"imagen-3.0-generate-002","videoModelName":"veo-2.0-generate-001","deprecatedTextModelNames":["gemini-2.0-flash"]})</script><script>(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Multas por Mora</title>
+    <script src="https://cdn.tailwindcss.com/"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Neutros Suaves y Azul Institucional -->
+    <!-- Application Structure Plan: Esta aplicación es una versión simplificada, enfocada únicamente en la 'Calculadora de Multas'. Su estructura es lineal: un encabezado, una descripción, el formulario de la calculadora y la sección de resultados. Esta simplicidad maximiza la usabilidad para una tarea específica, eliminando distracciones y facilitando un flujo de trabajo directo para el cálculo de multas. -->
+    <!-- Visualization & Content Choices:
+        - Información: Cálculo de multas por mora. Meta: Facilitar un cálculo complejo. Viz/Presentación: Calculadora interactiva (formulario HTML). Interacción: Inputs de usuario para fechas y montos, con salida de resultados en tiempo real. Justificación: Automatiza y elimina errores en un proceso manual propenso a fallos. Biblioteca: Vanilla JS.
+        - Información: Condición de extinción de contrato (8% del valor). Meta: Alertar sobre el umbral crítico. Viz/Presentación: Mensaje dinámico de texto. Interacción: Se actualiza automáticamente con el cálculo de la multa. Justificación: Proporciona una advertencia crucial basada en una regla específica del instructivo, ayudando al usuario a identificar situaciones de alto riesgo.
+        - Información: Prorrateo de multa por cantidad faltante. Meta: Aplicar multa proporcionalmente. Viz/Presentación: Nuevos campos de entrada para cantidades y un campo de solo lectura para la cantidad faltante. Interacción: Cálculo automático del monto base para la multa basado en las cantidades. Justificación: Permite un cálculo más justo y preciso de la multa cuando la entrega es parcial, o sobre el total del contrato si la entrega completa es tardía.
+        - Información: Datos del proveedor (nombre y DUI). Meta: Registrar información relevante. Viz/Presentación: Campos de entrada de texto. Interacción: Entrada manual de datos. Justificación: Permite asociar el cálculo de la multa a un proveedor específico para fines de registro.
+        - Información: Recomendaciones al exceder el 8%. Meta: Guiar al usuario en los siguientes pasos administrativos. Viz/Presentación: Bloque de texto condicionalmente visible. Interacción: Se muestra automáticamente cuando la condición se cumple. Justificación: Proporciona orientación crítica basada en el instructivo, ayudando a la toma de decisiones y al cumplimiento normativo.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .section-card { transition: transform 0.2s, box-shadow 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+        .section-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+
+        /* Estilos para impresión */
+        @media print {
+            header, footer {
+                display: none; /* Oculta el encabezado y el pie de página al imprimir */
+            }
+            body {
+                background-color: #fff !important; /* Fondo blanco para impresión */
+                color: #000 !important; /* Texto negro para impresión */
+                margin: 0;
+                padding: 0;
+                font-size: 9pt; /* Reduce el tamaño de la fuente para que quepa más */
+                zoom: 0.85; /* Intenta escalar el contenido para que quepa en una página */
+                -webkit-print-color-adjust: exact; /* Para que los colores de fondo se impriman */
+                print-color-adjust: exact;
+            }
+            main {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                max-width: none; /* Permite que el contenido ocupe todo el ancho */
+            }
+            section#calculadora {
+                box-shadow: none;
+                border: none;
+                padding: 0.5cm; /* Añade un poco de margen para la impresión */
+                margin: 0 auto; /* Centra el contenido */
+                border-radius: 0;
+                display: block; /* Asegura que la sección se muestre como bloque */
+                width: 100%;
+                max-width: 100%;
+            }
+            section#calculadora .grid {
+                grid-template-columns: 1fr; /* Fuerza una sola columna en impresión */
+                gap: 0.3cm; /* Reduce el espacio entre elementos */
+            }
+            section#calculadora .space-y-4 > div {
+                margin-bottom: 0.15cm; /* Reduce el espacio entre los campos */
+            }
+            section#calculadora h2, section#calculadora p {
+                text-align: left; /* Alinea el texto a la izquierda para mejor lectura en impresión */
+                margin-bottom: 0.3cm;
+            }
+            section#calculadora h3 {
+                font-size: 1.1em; /* Ajusta el tamaño del título de resultados */
+            }
+            section#calculadora label {
+                font-size: 0.85em; /* Ajusta el tamaño de las etiquetas */
+            }
+            section#calculadora input, section#calculadora select {
+                padding: 0.1cm; /* Reduce el padding de los inputs */
+                font-size: 0.85em;
+            }
+            #resultadoMulta .space-y-4 > div {
+                margin-bottom: 0.1cm; /* Ajusta espacio en la sección de resultados */
+            }
+            #resultadoMulta hr {
+                margin: 0.15cm 0; /* Ajusta el margen de las líneas divisorias */
+            }
+            #multaFinal {
+                font-size: 1.5em; /* Ajusta el tamaño de la multa final */
+            }
+            .bg-blue-600 {
+                background-color: #2563eb !important; /* Fondo azul para mejor contraste en impresión */
+                color: #fff !important;
+            }
+            .bg-red-100 {
+                background-color: #fee2e2 !important; /* Fondo para alerta en impresión */
+                color: #b91c1c !important;
+            }
+            .bg-green-100 {
+                background-color: #d1fae5 !important; /* Fondo para éxito en impresión */
+                color: #065f46 !important;
+            }
+            .print-button {
+                display: none; /* Oculta el botón de imprimir en la impresión */
+            }
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.16 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width: 640px){.container{max-width:640px}}@media (min-width: 768px){.container{max-width:768px}}@media (min-width: 1024px){.container{max-width:1024px}}@media (min-width: 1280px){.container{max-width:1280px}}@media (min-width: 1536px){.container{max-width:1536px}}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mt-12{margin-top:3rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.min-h-screen{min-height:100vh}.w-full{width:100%}.max-w-2xl{max-width:42rem}.max-w-4xl{max-width:56rem}.flex-grow{flex-grow:1}.cursor-not-allowed{cursor:not-allowed}.list-inside{list-style-position:inside}.list-decimal{list-style-type:decimal}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-8{gap:2rem}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.rounded-2xl{border-radius:1rem}.rounded-lg{border-radius:0.5rem}.border{border-width:1px}.border-t{border-top-width:1px}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.border-yellow-200{--tw-border-opacity:1;border-color:rgb(254 240 138 / var(--tw-border-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-yellow-50{--tw-bg-opacity:1;background-color:rgb(254 252 232 / var(--tw-bg-opacity, 1))}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-4{padding-top:1rem;padding-bottom:1rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-yellow-800{--tw-text-opacity:1;color:rgb(133 77 14 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.focus\:border-blue-500:focus{--tw-border-opacity:1;border-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-blue-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(59 130 246 / var(--tw-ring-opacity, 1))}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:p-8{padding:2rem}}</style></head>
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen">
+
+    <header class="bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-4 flex justify-center items-center">
+            <div class="text-2xl font-bold text-slate-700">
+                <span class="text-blue-600">Calculadora</span> de Multas por Mora
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8 flex-grow flex items-center justify-center">
+        <!-- Calculadora de Multas -->
+        <section id="calculadora" class="w-full max-w-4xl bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-slate-200 section-card">
+            <h2 class="text-3xl font-bold text-center mb-6 text-slate-700">Calculadora de Multas por Mora</h2>
+            <p class="text-center text-slate-500 mb-8 max-w-2xl mx-auto">Esta herramienta le permite calcular la multa por retraso en el cumplimiento de obligaciones contractuales, según el Art. 175 de la LCP. Ingrese los datos del contrato para obtener un cálculo preciso y detallado.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                <div class="space-y-4">
+                    <div>
+                        <label for="nombreProveedor" class="block text-sm font-medium text-slate-600 mb-1">Nombre del Proveedor</label>
+                        <input type="text" id="nombreProveedor" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Ej: Juan Pérez S.A.">
+                    </div>
+                    <div>
+                        <label for="duiProveedor" class="block text-sm font-medium text-slate-600 mb-1">Número de DUI del Proveedor</label>
+                        <input type="text" id="duiProveedor" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Ej: 00000000-0">
+                    </div>
+                    <div>
+                        <label for="valorContrato" class="block text-sm font-medium text-slate-600 mb-1">Monto del Contrato Adjudicado ($)</label>
+                        <input type="number" id="valorContrato" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Ej: 5000">
+                    </div>
+                    <div>
+                        <label for="cantidadContratada" class="block text-sm font-medium text-slate-600 mb-1">Cantidad Total Contratada (prendas/ítems)</label>
+                        <input type="number" id="cantidadContratada" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Ej: 100">
+                    </div>
+                    <div>
+                        <label for="cantidadEntregadas" class="block text-sm font-medium text-slate-600 mb-1">Cantidad de Prendas Entregadas</label>
+                        <input type="number" id="cantidadEntregadas" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Ej: 80">
+                    </div>
+                    <div>
+                        <label for="cantidadFaltantes" class="block text-sm font-medium text-slate-600 mb-1">Cantidad de Prendas Faltantes</label>
+                        <input type="number" id="cantidadFaltantes" class="w-full p-3 bg-slate-100 border border-slate-300 rounded-lg cursor-not-allowed" readonly="">
+                    </div>
+                    <div>
+                        <label for="fechaFin" class="block text-sm font-medium text-slate-600 mb-1">Fecha de Finalización del Plazo</label>
+                        <input type="date" id="fechaFin" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                    <div>
+                        <label for="fechaEntrega" class="block text-sm font-medium text-slate-600 mb-1">Fecha de Entrega Real</label>
+                        <input type="date" id="fechaEntrega" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+                    <div>
+                        <label for="salarioMinimo" class="block text-sm font-medium text-slate-600 mb-1">Salario Mínimo Vigente ($)</label>
+                        <input type="number" id="salarioMinimo" value="365.00" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Ej: 365.00">
+                    </div>
+                </div>
+                <div id="resultadoMulta" class="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                    <h3 class="font-bold text-lg mb-4 text-slate-700">Resultado del Cálculo</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-600">Días de Retraso:</span>
+                            <span id="diasRetraso" class="font-bold text-xl text-slate-800">0</span>
+                        </div>
+                        <hr>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-600">Valor Unitario del Contrato:</span>
+                            <span id="valorUnitarioContrato" class="font-bold text-xl text-slate-800">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-600">Monto Base para Multa:</span>
+                            <span id="montoBaseMulta" class="font-bold text-xl text-slate-800">$0.00</span>
+                        </div>
+                        <hr>
+                        <div id="detalleCalculo" class="text-sm text-slate-500 space-y-2"><p>Por favor, complete todos los campos requeridos y asegúrese que la Cantidad Total Contratada sea mayor a 0.</p></div>
+                        <hr>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-slate-600">Multa Calculada (por días y base):</span>
+                            <span id="multaCalculada" class="font-bold text-xl text-slate-800">$0.00</span>
+                        </div>
+                         <div class="flex justify-between items-center mt-2 text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
+                            <span class="font-semibold">Multa Mínima Aplicable:</span>
+                            <span id="multaMinima" class="font-bold">$0.00</span>
+                        </div>
+                        <div class="bg-blue-600 text-white p-4 rounded-lg mt-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-semibold">MULTA FINAL A IMPONER:</span>
+                                <span id="multaFinal" class="font-extrabold text-3xl">$0.00</span>
+                            </div>
+                        </div>
+                        <div id="extincionContrato" class="mt-4 p-3 text-sm rounded-lg font-semibold hidden"></div>
+                        
+                        <!-- Nueva sección de recomendaciones -->
+                        <div id="recomendacionesExtincion" class="mt-6 p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg hidden">
+                            <h4 class="font-bold text-base mb-2">Recomendaciones a Seguir (si la multa excede el 8%):</h4>
+                            <p class="text-sm mb-2">Según el Art. 175 de la LCP, si la multa por mora excede el 8% del valor del contrato, se podrá iniciar el procedimiento de extinción contractual por caducidad (Art. 167 literal c) de la LCP).</p>
+                            <ol class="list-decimal list-inside text-sm space-y-1">
+                                <li>**Asesoría:** Contactar a la Dirección Departamental de Educación (DDE) o la Gerencia de Paquetes Escolares para iniciar el procedimiento.</li>
+                                <li>**Resolución de Inicio:** Elaborar la "Resolución Iniciando el Procedimiento de Extinción de Contrato" (Anexo 31 del Instructivo).</li>
+                                <li>**Notificación al Contratista:** Notificar formalmente al proveedor (Anexo 32), otorgándole un plazo de 10 días hábiles para ejercer su derecho de audiencia y defensa.</li>
+                                <li>**Continuación del Proceso:** Si el proveedor no acepta el incumplimiento o no asiste a la audiencia inicial, se deberá emitir una "Resolución Abriendo a Pruebas el Procedimiento de Extinción" (Anexo 34), dándole 8 días hábiles para presentar pruebas (Anexo 35).</li>
+                                <li>**Resolución Final:** Si el incumplimiento persiste o no es desvirtuado, se procede con la "Resolución Declarando Extinguido el Contrato" (Anexo 36) y su notificación (Anexo 37).</li>
+                                <li>**Ejecución de Garantías:** Iniciar el proceso para hacer efectiva la Garantía de Cumplimiento de Contrato y, si aplica, la Garantía de Buen Uso y Resguardo de Tela (Anexos 45, 46 y 47).</li>
+                                <li>**Inhabilitación:** Solicitar a la DINAC que establezca la incapacidad del contratista para contratar en el RUPES (Anexo 38).</li>
+                            </ol>
+                            <p class="text-sm mt-2 font-semibold">Es fundamental seguir estrictamente los procedimientos establecidos en la Ley de Procedimientos Administrativos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white mt-12 border-t border-slate-200">
+        <div class="container mx-auto px-6 py-4 text-center text-slate-500 text-sm">
+            <p>© 2025 Calculadora de Multas. Herramienta de apoyo.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const valorContratoInput = document.getElementById('valorContrato');
+            const cantidadContratadaInput = document.getElementById('cantidadContratada');
+            const cantidadEntregadasInput = document.getElementById('cantidadEntregadas');
+            const cantidadFaltantesInput = document.getElementById('cantidadFaltantes');
+            const fechaFinInput = document.getElementById('fechaFin');
+            const fechaEntregaInput = document.getElementById('fechaEntrega');
+            const salarioMinimoInput = document.getElementById('salarioMinimo');
+            
+            const diasRetrasoEl = document.getElementById('diasRetraso');
+            const valorUnitarioContratoEl = document.getElementById('valorUnitarioContrato');
+            const montoBaseMultaEl = document.getElementById('montoBaseMulta');
+            const multaCalculadaEl = document.getElementById('multaCalculada');
+            const multaMinimaEl = document.getElementById('multaMinima');
+            const multaFinalEl = document.getElementById('multaFinal');
+            const detalleCalculoEl = document.getElementById('detalleCalculo');
+            const extincionContratoEl = document.getElementById('extincionContrato');
+            const recomendacionesExtincionEl = document.getElementById('recomendacionesExtincion'); // Nuevo elemento
+
+            function calcularMulta() {
+                const montoContratoAdjudicado = parseFloat(valorContratoInput.value) || 0;
+                const cantidadContratada = parseFloat(cantidadContratadaInput.value) || 0;
+                const cantidadEntregadas = parseFloat(cantidadEntregadasInput.value) || 0;
+                const fechaFin = fechaFinInput.value ? new Date(fechaFinInput.value + 'T00:00:00') : null;
+                const fechaEntrega = fechaEntregaInput.value ? new Date(fechaEntregaInput.value + 'T00:00:00') : null;
+                const salarioMinimo = parseFloat(salarioMinimoInput.value) || 0;
+
+                // Calcular cantidad faltante y actualizar campo de solo lectura
+                const cantidadFaltantes = Math.max(0, cantidadContratada - cantidadEntregadas);
+                cantidadFaltantesInput.value = cantidadFaltantes;
+
+                // Reset outputs if critical inputs are missing or invalid
+                if (!montoContratoAdjudicado || !fechaFin || !fechaEntrega || !salarioMinimo || cantidadContratada <= 0) {
+                    diasRetrasoEl.textContent = '0';
+                    valorUnitarioContratoEl.textContent = '$0.00';
+                    montoBaseMultaEl.textContent = '$0.00';
+                    multaCalculadaEl.textContent = '$0.00';
+                    multaMinimaEl.textContent = '$0.00';
+                    multaFinalEl.textContent = '$0.00';
+                    detalleCalculoEl.innerHTML = '<p>Por favor, complete todos los campos requeridos y asegúrese que la Cantidad Total Contratada sea mayor a 0.</p>';
+                    extincionContratoEl.classList.add('hidden');
+                    recomendacionesExtincionEl.classList.add('hidden'); // Ocultar recomendaciones
+                    return;
+                }
+
+                const diffTime = Math.max(0, fechaEntrega - fechaFin);
+                const diasRetraso = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                diasRetrasoEl.textContent = diasRetraso;
+
+                // Determine the value subject to penalty based on whether items are missing or just late
+                let valueSubjectToPenalty = 0;
+                let penaltyBasisDescription = '';
+
+                const valorUnitario = montoContratoAdjudicado / cantidadContratada;
+                valorUnitarioContratoEl.textContent = `$${valorUnitario.toFixed(2)}`;
+
+                if (cantidadFaltantes > 0) {
+                    valueSubjectToPenalty = valorUnitario * cantidadFaltantes;
+                    penaltyBasisDescription = `(por el valor de las ${cantidadFaltantes} prendas faltantes)`;
+                } else { // cantidadFaltantes === 0, meaning all items were delivered, possibly late
+                    valueSubjectToPenalty = montoContratoAdjudicado;
+                    penaltyBasisDescription = `(por el valor total del contrato entregado tardíamente)`;
+                }
+                
+                montoBaseMultaEl.textContent = `$${valueSubjectToPenalty.toFixed(2)}`;
+
+
+                let multa = 0;
+                let detalleHTML = '';
+
+                if (diasRetraso > 0) {
+                    // Calculate penalty only if there's a delay and either items are missing or the whole contract is late
+                    if (valueSubjectToPenalty > 0 || (diasRetraso > 0 && cantidadFaltantes === 0)) {
+                        const baseForCalculation = (cantidadFaltantes > 0) ? valueSubjectToPenalty : montoContratoAdjudicado;
+                        const descForCalculation = (cantidadFaltantes > 0) ? penaltyBasisDescription : `(por el valor total del contrato entregado tardíamente)`;
+
+                        const diasTramo1 = Math.min(diasRetraso, 30);
+                        const multaTramo1 = diasTramo1 * baseForCalculation * 0.001;
+                        multa += multaTramo1;
+                        detalleHTML += `<p>${diasTramo1} días al 0.10%: $${multaTramo1.toFixed(2)}</p>`;
+                        
+                        if (diasRetraso > 30) {
+                            const diasTramo2 = Math.min(diasRetraso - 30, 30);
+                            const multaTramo2 = diasTramo2 * baseForCalculation * 0.00125;
+                            multa += multaTramo2;
+                            detalleHTML += `<p>${diasTramo2} días al 0.125%: $${multaTramo2.toFixed(2)}</p>`;
+                        }
+
+                        if (diasRetraso > 60) {
+                            const diasTramo3 = diasRetraso - 60;
+                            const multaTramo3 = diasTramo3 * baseForCalculation * 0.0015;
+                            multa += multaTramo3;
+                            detalleHTML += `<p>${diasTramo3} días al 0.15%: $${multaTramo3.toFixed(2)}</p>`;
+                        }
+                        detalleHTML = `<p>Base del cálculo: $${baseForCalculation.toFixed(2)} ${descForCalculation}</p>` + detalleHTML;
+
+                    } else { // diasRetraso > 0 but no items missing and no penalty applied to total (shouldn't happen with new logic, but for safety)
+                         detalleHTML = '<p>No aplica multa. No hay retraso o no hay prendas faltantes.</p>';
+                    }
+                } else { // diasRetraso === 0
+                    detalleHTML = '<p>No hay retraso en la entrega.</p>';
+                }
+                
+                detalleCalculoEl.innerHTML = detalleHTML;
+                multaCalculadaEl.textContent = `$${multa.toFixed(2)}`;
+
+                let multaMinima = 0;
+                if (montoContratoAdjudicado > 10000) {
+                    multaMinima = salarioMinimo;
+                } else {
+                    multaMinima = salarioMinimo * 0.5;
+                }
+                multaMinimaEl.textContent = `$${multaMinima.toFixed(2)}`;
+
+                // Final penalty is applied only if there's a delay AND there's a calculated base for penalty
+                const multaFinal = (diasRetraso > 0 && (cantidadFaltantes > 0 || (diasRetraso > 0 && cantidadFaltantes === 0))) ? Math.max(multa, multaMinima) : 0;
+                multaFinalEl.textContent = `$${multaFinal.toFixed(2)}`;
+
+                // Lógica para el 8% del contrato (basado en el monto total del contrato)
+                const umbralExtincion = montoContratoAdjudicado * 0.08;
+                if (multaFinal > 0 && multaFinal > umbralExtincion) { // Only show warning if a final multa is actually applied and exceeds threshold
+                    extincionContratoEl.classList.remove('hidden');
+                    extincionContratoEl.classList.remove('bg-green-100', 'text-green-700');
+                    extincionContratoEl.classList.add('bg-red-100', 'text-red-700');
+                    extincionContratoEl.innerHTML = `⚠️ La multa final ($${multaFinal.toFixed(2)}) excede el 8% del valor del contrato ($${umbralExtincion.toFixed(2)}). Esto podría ser causal de extinción del contrato.`;
+                    recomendacionesExtincionEl.classList.remove('hidden'); // Mostrar recomendaciones
+                } else if (multaFinal > 0 && multaFinal <= umbralExtincion) { // Show green if multa is applied but within threshold
+                    extincionContratoEl.classList.remove('hidden');
+                    extincionContratoEl.classList.remove('bg-red-100', 'text-red-700');
+                    extincionContratoEl.classList.add('bg-green-100', 'text-green-700');
+                    extincionContratoEl.innerHTML = `✅ La multa final ($${multaFinal.toFixed(2)}) no excede el 8% del valor del contrato ($${umbralExtincion.toFixed(2)}).`;
+                    recomendacionesExtincionEl.classList.add('hidden'); // Ocultar recomendaciones
+                } else {
+                    extincionContratoEl.classList.add('hidden');
+                    recomendacionesExtincionEl.classList.add('hidden'); // Ocultar recomendaciones
+                }
+            }
+
+            // Event listeners para todos los campos relevantes
+            [valorContratoInput, cantidadContratadaInput, cantidadEntregadasInput, fechaFinInput, fechaEntregaInput, salarioMinimoInput].forEach(input => {
+                input.addEventListener('input', calcularMulta);
+            });
+
+            // Llamar al cálculo inicial por si hay valores precargados o para establecer el estado inicial
+            calcularMulta();
+        });
+    </script>
+
+
+</body></html>
